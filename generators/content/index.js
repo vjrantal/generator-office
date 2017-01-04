@@ -8,12 +8,12 @@ var guid = require('uuid');
 var Xml2Js = require('xml2js');
 var _ = require('lodash');
 
-module.exports = generators.Base.extend({
+module.exports = generators.extend({
   /**
    * Setup the generator
    */
   constructor: function(){
-    generators.Base.apply(this, arguments);
+    generators.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,

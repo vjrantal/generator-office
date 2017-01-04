@@ -5,10 +5,15 @@ var chalk = require('chalk');
 var yosay = require('yosay');
 var extend = require('deep-extend');
 
-module.exports = generators.Base.extend({
+// Application Insight setup
+process.env.APPINSIGHTS_INSTRUMENTATIONKEY = 'c448bdfb-520d-4ecb-be25-7b7578118025';
+var appInsights = require('applicationinsights');
+var insight = appInsights.getClient();
+
+module.exports = generators.extend({
   constructor: function(){
 
-    generators.Base.apply(this, arguments);
+    generators.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,
@@ -125,10 +130,18 @@ module.exports = generators.Base.extend({
             }]
         }];
 
+      insight.trackTrace('User begins to choose options');
+      var start = (new Date()).getTime();
+
       // trigger prompts
       this.prompt(prompts).then(function(responses){
         this.genConfig = extend(this.genConfig, this.options);
         this.genConfig = extend(this.genConfig, responses);
+
+        var end = (new Date()).getTime();
+        var duration = (end - start)/1000;
+
+        insight.trackEvent('PROJECT_TYPE', { Project_Type: this.genConfig.type }, { duration });
         done();
       }.bind(this));
     }, // askFor()
@@ -149,9 +162,17 @@ module.exports = generators.Base.extend({
         when: this.options.appId === undefined
       }];
 
+      insight.trackTrace('User input for ng-adal appId');
+      var start = (new Date()).getTime();
+
       // trigger prompts
       this.prompt(prompts).then(function(responses){
         this.genConfig = extend(this.genConfig, responses);
+        
+        var end = (new Date()).getTime();
+        var duration = (end - start)/1000;
+
+        insight.trackEvent('APP_OPTIONS', { AppID: this.genConfig.appId }, { duration });
         done();
       }.bind(this));
 
@@ -222,52 +243,77 @@ module.exports = generators.Base.extend({
       // Mail Office Add-in
       case 'mail':
         // execute subgenerator
-        this.composeWith('office:mail', {
-          options: {
-            name: this.genConfig.name,
-            'root-path': this.genConfig['root-path'],
-            tech: this.genConfig.tech,
-            outlookForm: this.genConfig.outlookForm,
-            extensionPoint: this.genConfig.extensionPoint,
-            appId: this.genConfig.appId,
-            'skip-install': this.options['skip-install']
-          }
-        }, {
-            local: require.resolve('../mail')
-          });
+        this.composeWith(require.resolve('../mail'), {
+          name: this.genConfig.name,
+          'root-path': this.genConfig['root-path'],
+          tech: this.genConfig.tech,
+          outlookForm: this.genConfig.outlookForm,
+          extensionPoint: this.genConfig.extensionPoint,
+          appId: this.genConfig.appId,
+          'skip-install': this.options['skip-install']
+        })
+        // this.composeWith('office:mail', {
+        //   options: {
+        //     name: this.genConfig.name,
+        //     'root-path': this.genConfig['root-path'],
+        //     tech: this.genConfig.tech,
+        //     outlookForm: this.genConfig.outlookForm,
+        //     extensionPoint: this.genConfig.extensionPoint,
+        //     appId: this.genConfig.appId,
+        //     'skip-install': this.options['skip-install']
+        //   }
+        // }, {
+        //     local: require.resolve('../mail')
+        //   });
         break;
 
       // Taskpane Office Add-in
       case 'taskpane':
         // execute subgenerator
-        this.composeWith('office:taskpane', {
-          options: {
-            name: this.genConfig.name,
-            'root-path': this.genConfig['root-path'],
-            tech: this.genConfig.tech,
-            appId: this.genConfig.appId,
-            clients: this.genConfig.clients,
-            'skip-install': this.options['skip-install']
-          }
-        }, {
-            local: require.resolve('../taskpane')
-          });
+        this.composeWith(require.resolve('../taskpane'), {
+          name: this.genConfig.name,
+          'root-path': this.genConfig['root-path'],
+          tech: this.genConfig.tech,
+          appId: this.genConfig.appId,
+          clients: this.genConfig.clients,
+          'skip-install': this.options['skip-install']
+        })
+        // this.composeWith('office:taskpane', {
+        //   options: {
+        //     name: this.genConfig.name,
+        //     'root-path': this.genConfig['root-path'],
+        //     tech: this.genConfig.tech,
+        //     appId: this.genConfig.appId,
+        //     clients: this.genConfig.clients,
+        //     'skip-install': this.options['skip-install']
+        //   }
+        // }, {
+        //     local: require.resolve('../taskpane')
+        //   });
         break;
       // Content Office Add-in
       case 'content':
         // execute subgenerator
-        this.composeWith('office:content', {
-          options: {
-            name: this.genConfig.name,
-            'root-path': this.genConfig['root-path'],
-            tech: this.genConfig.tech,
-            appId: this.genConfig.appId,
-            clients: this.genConfig.clients,
-            'skip-install': this.options['skip-install']
-          }
-        }, {
-            local: require.resolve('../content')
-          });
+        this.composeWith(require.resolve('../content'), {
+          name: this.genConfig.name,
+          'root-path': this.genConfig['root-path'],
+          tech: this.genConfig.tech,
+          appId: this.genConfig.appId,
+          clients: this.genConfig.clients,
+          'skip-install': this.options['skip-install']
+        })
+        // this.composeWith('office:content', {
+        //   options: {
+        //     name: this.genConfig.name,
+        //     'root-path': this.genConfig['root-path'],
+        //     tech: this.genConfig.tech,
+        //     appId: this.genConfig.appId,
+        //     clients: this.genConfig.clients,
+        //     'skip-install': this.options['skip-install']
+        //   }
+        // }, {
+        //     local: require.resolve('../content')
+        //   });
         break;
     }
   }, // default()

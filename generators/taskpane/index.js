@@ -8,12 +8,17 @@ var guid = require('uuid');
 var Xml2Js = require('xml2js');
 var _ = require('lodash');
 
-module.exports = generators.Base.extend({
+// Application Insight setup
+process.env.APPINSIGHTS_INSTRUMENTATIONKEY = 'c448bdfb-520d-4ecb-be25-7b7578118025';
+var appInsights = require('applicationinsights');
+var insight = appInsights.getClient();
+
+module.exports = generators.extend({
   /**
    * Setup the generator
    */
   constructor: function(){
-    generators.Base.apply(this, arguments);
+    generators.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,
@@ -151,10 +156,17 @@ module.exports = generators.Base.extend({
           }
         }];
 
+      insight.trackTrace('User begins to choose options in taskpane');
+      var start = (new Date()).getTime();
       // trigger prompts
       this.prompt(prompts).then(function(responses){
         this.genConfig = extend(this.genConfig, this.options);
         this.genConfig = extend(this.genConfig, responses);
+
+        var end = (new Date()).getTime();
+        var duration = (end - start)/1000;
+        insight.trackEvent('TASKPANE_OPTIONS', { Tech: this.genConfig.tech, Hosts: this.genConfig.clients }, { duration });
+        
         done();
       }.bind(this));
 
@@ -176,9 +188,17 @@ module.exports = generators.Base.extend({
         when: this.options.appId === undefined
       }];
 
+      insight.trackTrace('User input for ng-adal appId');
+      var start = (new Date()).getTime();
+
       // trigger prompts
       this.prompt(prompts).then(function(responses){
         this.genConfig = extend(this.genConfig, responses);
+                
+        var end = (new Date()).getTime();
+        var duration = (end - start)/1000;
+
+        insight.trackEvent('APP_ID', { AppID: this.genConfig.appId }, { duration });
         done();
       }.bind(this));
 
