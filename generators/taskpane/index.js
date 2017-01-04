@@ -13,12 +13,12 @@ process.env.APPINSIGHTS_INSTRUMENTATIONKEY = 'c448bdfb-520d-4ecb-be25-7b75781180
 var appInsights = require('applicationinsights');
 var insight = appInsights.getClient();
 
-module.exports = generators.extend({
+module.exports = generators.Base.extend({
   /**
    * Setup the generator
    */
   constructor: function(){
-    generators.apply(this, arguments);
+    generators.Base.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,

@@ -8,12 +8,12 @@ var extend = require('deep-extend');
 var guid = require('uuid');
 var Xml2Js = require('xml2js');
 
-module.exports = generators.extend({
+module.exports = generators.Base.extend({
   /**
    * Setup the generator
    */
   constructor: function(){
-    generators.apply(this, arguments);
+    generators.Base.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,
@@ -251,26 +251,18 @@ module.exports = generators.extend({
 
   default: function() {
     // Invoke the commands subgenerator
-    this.composeWith(require.resolve('../commands'), {
-      type: 'mail',
-      'root-path': this.genConfig['root-path'],
-      'manifest-file': 'manifest-' + this.genConfig.projectInternalName + '.xml',
-      'manifest-only': this.genConfig.tech === 'manifest-only',
-      extensionPoint: this.genConfig.extensionPoint,
-      commands: this.genConfig.commands
-    })
-    // this.composeWith('office:commands', {
-    //   options: {
-    //     type: 'mail',
-    //     'root-path': this.genConfig['root-path'],
-    //     'manifest-file': 'manifest-' + this.genConfig.projectInternalName + '.xml',
-    //     'manifest-only': this.genConfig.tech === 'manifest-only',
-    //     extensionPoint: this.genConfig.extensionPoint,
-    //     commands: this.genConfig.commands
-    //   }
-    // }, {
-    //     local: require.resolve('../commands')
-    // });
+    this.composeWith('office:commands', {
+      options: {
+        type: 'mail',
+        'root-path': this.genConfig['root-path'],
+        'manifest-file': 'manifest-' + this.genConfig.projectInternalName + '.xml',
+        'manifest-only': this.genConfig.tech === 'manifest-only',
+        extensionPoint: this.genConfig.extensionPoint,
+        commands: this.genConfig.commands
+      }
+    }, {
+        local: require.resolve('../commands')
+    });
   },
 
   /**

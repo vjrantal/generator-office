@@ -10,10 +10,10 @@ process.env.APPINSIGHTS_INSTRUMENTATIONKEY = 'c448bdfb-520d-4ecb-be25-7b75781180
 var appInsights = require('applicationinsights');
 var insight = appInsights.getClient();
 
-module.exports = generators.extend({
+module.exports = generators.Base.extend({
   constructor: function(){
 
-    generators.apply(this, arguments);
+    generators.Base.apply(this, arguments);
 
     this.option('skip-install', {
       type: Boolean,
@@ -243,77 +243,52 @@ module.exports = generators.extend({
       // Mail Office Add-in
       case 'mail':
         // execute subgenerator
-        this.composeWith(require.resolve('../mail'), {
-          name: this.genConfig.name,
-          'root-path': this.genConfig['root-path'],
-          tech: this.genConfig.tech,
-          outlookForm: this.genConfig.outlookForm,
-          extensionPoint: this.genConfig.extensionPoint,
-          appId: this.genConfig.appId,
-          'skip-install': this.options['skip-install']
-        })
-        // this.composeWith('office:mail', {
-        //   options: {
-        //     name: this.genConfig.name,
-        //     'root-path': this.genConfig['root-path'],
-        //     tech: this.genConfig.tech,
-        //     outlookForm: this.genConfig.outlookForm,
-        //     extensionPoint: this.genConfig.extensionPoint,
-        //     appId: this.genConfig.appId,
-        //     'skip-install': this.options['skip-install']
-        //   }
-        // }, {
-        //     local: require.resolve('../mail')
-        //   });
+        this.composeWith('office:mail', {
+          options: {
+            name: this.genConfig.name,
+            'root-path': this.genConfig['root-path'],
+            tech: this.genConfig.tech,
+            outlookForm: this.genConfig.outlookForm,
+            extensionPoint: this.genConfig.extensionPoint,
+            appId: this.genConfig.appId,
+            'skip-install': this.options['skip-install']
+          }
+        }, {
+            local: require.resolve('../mail')
+          });
         break;
 
       // Taskpane Office Add-in
       case 'taskpane':
         // execute subgenerator
-        this.composeWith(require.resolve('../taskpane'), {
-          name: this.genConfig.name,
-          'root-path': this.genConfig['root-path'],
-          tech: this.genConfig.tech,
-          appId: this.genConfig.appId,
-          clients: this.genConfig.clients,
-          'skip-install': this.options['skip-install']
-        })
-        // this.composeWith('office:taskpane', {
-        //   options: {
-        //     name: this.genConfig.name,
-        //     'root-path': this.genConfig['root-path'],
-        //     tech: this.genConfig.tech,
-        //     appId: this.genConfig.appId,
-        //     clients: this.genConfig.clients,
-        //     'skip-install': this.options['skip-install']
-        //   }
-        // }, {
-        //     local: require.resolve('../taskpane')
-        //   });
+        this.composeWith('office:taskpane', {
+          options: {
+            name: this.genConfig.name,
+            'root-path': this.genConfig['root-path'],
+            tech: this.genConfig.tech,
+            appId: this.genConfig.appId,
+            clients: this.genConfig.clients,
+            'skip-install': this.options['skip-install']
+          }
+        }, {
+            local: require.resolve('../taskpane')
+          });
         break;
       // Content Office Add-in
       case 'content':
         // execute subgenerator
-        this.composeWith(require.resolve('../content'), {
-          name: this.genConfig.name,
-          'root-path': this.genConfig['root-path'],
-          tech: this.genConfig.tech,
-          appId: this.genConfig.appId,
-          clients: this.genConfig.clients,
-          'skip-install': this.options['skip-install']
-        })
-        // this.composeWith('office:content', {
-        //   options: {
-        //     name: this.genConfig.name,
-        //     'root-path': this.genConfig['root-path'],
-        //     tech: this.genConfig.tech,
-        //     appId: this.genConfig.appId,
-        //     clients: this.genConfig.clients,
-        //     'skip-install': this.options['skip-install']
-        //   }
-        // }, {
-        //     local: require.resolve('../content')
-        //   });
+        this.composeWith('office:content', {
+          options: {
+            name: this.genConfig.name,
+            'root-path': this.genConfig['root-path'],
+            tech: this.genConfig.tech,
+            appId: this.genConfig.appId,
+            clients: this.genConfig.clients,
+            'skip-install': this.options['skip-install']
+          }
+        }, {
+            local: require.resolve('../content')
+          });
         break;
     }
   }, // default()

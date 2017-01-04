@@ -8,12 +8,12 @@ var extend = require('deep-extend');
 var guid = require('uuid');
 var Xml2Js = require('xml2js');
 
-module.exports = generators.extend({
+module.exports = generators.Base.extend({
   /**
    * Setup the generator
    */
   constructor: function(){
-    generators.apply(this, arguments);
+    generators.Base.apply(this, arguments);
 
     // Shared options
     this.option('type', {
